@@ -44,20 +44,14 @@ public class BoardService {
                     () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
             );
             Board b = Board.builder()
-                    .title(boardRequestDto.getTitle())
-                    .content(boardRequestDto.getContent())
+                    .boardRequestDto(boardRequestDto)
                     .user(user)
                     .build();
-                    // 요청받은 DTO 로 DB에 저장할 객체 만들기
+            // 요청받은 DTO 로 DB에 저장할 객체 만들기
             boardRepository.save(b);
 
             return BoardResponseDto.builder()
-                    .title(b.title)
-                    .content(b.content)
-                    .createdAt(b.getCreatedAt())
-                    .id(b.getId())
-                    .modifiedAt(b.getModifiedAt())
-                    .username(b.getUser().getUsername())
+                    .board(b)
                     .build();
         } else {
             return null;
@@ -70,12 +64,7 @@ public class BoardService {
         List<BoardResponseDto> boardResponseDto = new ArrayList<>();
         for (Board b : boards) {
             boardResponseDto.add(BoardResponseDto.builder()
-                    .title(b.title)
-                    .content(b.content)
-                    .createdAt(b.getCreatedAt())
-                    .id(b.getId())
-                    .modifiedAt(b.getModifiedAt())
-                    .username(b.getUser().getUsername())
+                    .board(b)
                     .build());
         }
         return boardResponseDto;
@@ -87,12 +76,7 @@ public class BoardService {
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
         return BoardResponseDto.builder()
-                .title(board.title)
-                .content(board.content)
-                .createdAt(board.getCreatedAt())
-                .id(board.getId())
-                .modifiedAt(board.getModifiedAt())
-                .username(board.getUser().getUsername())
+                .board(board)
                 .build();
     }
 
@@ -119,12 +103,7 @@ public class BoardService {
             board.update(boardRequestDto);
             // 요청받은 DTO 로 DB에 저장할 객체 만들기
             return BoardResponseDto.builder()
-                    .title(board.title)
-                    .content(board.content)
-                    .createdAt(board.getCreatedAt())
-                    .id(board.getId())
-                    .modifiedAt(board.getModifiedAt())
-                    .username(board.getUser().getUsername())
+                    .board(board)
                     .build();
         } else {
             return null;

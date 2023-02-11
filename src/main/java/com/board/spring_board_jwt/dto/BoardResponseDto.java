@@ -6,7 +6,6 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 @Getter
-@Builder
 public class BoardResponseDto {
     private Long id;
     private String title;
@@ -14,13 +13,13 @@ public class BoardResponseDto {
     private String username;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
-
-//    public BoardResponseDto(Board board) {
-//        id = board.getId();
-//        title = board.getTitle();
-//        content = board.getContent();
-//        username = board.getUser().getUsername();
-//        createdAt = board.getCreatedAt();
-//        modifiedAt = board.getModifiedAt();
-//    }
+    @Builder
+    public BoardResponseDto(Board board) {
+        id = board.getId();
+        title = board.getTitle();
+        content = board.getContent();
+        username = board.getUser().getUsername();
+        createdAt = board.getCreatedAt();
+        modifiedAt = board.getModifiedAt();
+    }
 }

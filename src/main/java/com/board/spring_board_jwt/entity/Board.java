@@ -6,11 +6,8 @@ import lombok.*;
 import javax.persistence.*;
 
 @Getter
-@Setter
 @Entity
-@NoArgsConstructor
-@Builder
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Board extends Timestamped{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,12 +22,12 @@ public class Board extends Timestamped{
     @ManyToOne
     @JoinColumn(name = "USERS_ID", nullable = false)
     private User user;
-
-//    public Board(BoardRequestDto boardRequestDto, User user) {
-//        this.title = boardRequestDto.getTitle();
-//        this.content = boardRequestDto.getContent();
-//        this.user = user;
-//    }
+    @Builder
+    public Board(BoardRequestDto boardRequestDto, User user) {
+        this.title = boardRequestDto.getTitle();
+        this.content = boardRequestDto.getContent();
+        this.user = user;
+    }
 
     public void update(BoardRequestDto boardRequestDto) {
         this.content = boardRequestDto.getContent();
