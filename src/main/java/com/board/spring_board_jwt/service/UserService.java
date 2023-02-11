@@ -38,17 +38,28 @@ public class UserService {
 
         Pattern pwPattern = Pattern.compile("^([a-zA-Z[0-9]]){8,15}$"); //8자 영문+숫자
         Matcher pwMatcher = pwPattern.matcher(password);
-        ResponseMsgDto noName = new ResponseMsgDto("아이디는 4자 이상의 영소문자, 숫자만 가능합니다.", HttpStatus.BAD_REQUEST.value());
-        ResponseMsgDto noPw = new ResponseMsgDto("비밀번호는 8자 이상의 영대소문자, 숫자만 가능합니다.", HttpStatus.BAD_REQUEST.value());
-
+        ResponseMsgDto noName = ResponseMsgDto.builder()
+                .msg("아이디는 4자 이상의 영소문자, 숫자만 가능합니다.")
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build();
+        ResponseMsgDto noPw = ResponseMsgDto.builder()
+                .msg("비밀번호는 8자 이상의 영대소문자, 숫자만 가능합니다.")
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build();
         if (!pwMatcher.find()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noPw);
         } else if (!nameMatcher.find()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noName);
         } else {
-            User user = new User(username,password);
+            User user = User.builder()
+                    .username(username)
+                    .password(password)
+                    .build();
             userRepository.save(user);
-            ResponseMsgDto ok = new ResponseMsgDto("회원가입 완료!", HttpStatus.OK.value());
+            ResponseMsgDto ok = ResponseMsgDto.builder()
+                    .msg("회원가입 완료!")
+                    .statusCode(HttpStatus.OK.value())
+                    .build();
             return ResponseEntity.status(HttpStatus.OK).body(ok);
         }
     }
@@ -63,7 +74,10 @@ public class UserService {
         if(!user.getPassword().equals(password)){
             throw  new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
-        ResponseMsgDto responseMsgDto = new ResponseMsgDto("로그인 완료!", HttpStatus.OK.value());
+        ResponseMsgDto responseMsgDto = ResponseMsgDto.builder()
+                .msg("로그인 완료!")
+                .statusCode(HttpStatus.OK.value())
+                .build();
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername()));
         return ResponseEntity.status(HttpStatus.OK).body(responseMsgDto);
     }

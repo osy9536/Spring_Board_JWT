@@ -43,11 +43,22 @@ public class BoardService {
             User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
                     () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
             );
-            Board b = new Board(boardRequestDto, user);
-            // 요청받은 DTO 로 DB에 저장할 객체 만들기
+            Board b = Board.builder()
+                    .title(boardRequestDto.getTitle())
+                    .content(boardRequestDto.getContent())
+                    .user(user)
+                    .build();
+                    // 요청받은 DTO 로 DB에 저장할 객체 만들기
             boardRepository.save(b);
 
-            return new BoardResponseDto(b);
+            return BoardResponseDto.builder()
+                    .title(b.title)
+                    .content(b.content)
+                    .createdAt(b.getCreatedAt())
+                    .id(b.getId())
+                    .modifiedAt(b.getModifiedAt())
+                    .username(b.getUser().getUsername())
+                    .build();
         } else {
             return null;
         }
@@ -58,7 +69,14 @@ public class BoardService {
         List<Board> boards = boardRepository.findAllByOrderByCreatedAtDesc();
         List<BoardResponseDto> boardResponseDto = new ArrayList<>();
         for (Board b : boards) {
-            boardResponseDto.add(new BoardResponseDto(b));
+            boardResponseDto.add(BoardResponseDto.builder()
+                    .title(b.title)
+                    .content(b.content)
+                    .createdAt(b.getCreatedAt())
+                    .id(b.getId())
+                    .modifiedAt(b.getModifiedAt())
+                    .username(b.getUser().getUsername())
+                    .build());
         }
         return boardResponseDto;
     }
@@ -68,7 +86,14 @@ public class BoardService {
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
-        return new BoardResponseDto(board);
+        return BoardResponseDto.builder()
+                .title(board.title)
+                .content(board.content)
+                .createdAt(board.getCreatedAt())
+                .id(board.getId())
+                .modifiedAt(board.getModifiedAt())
+                .username(board.getUser().getUsername())
+                .build();
     }
 
     @Transactional
@@ -93,7 +118,14 @@ public class BoardService {
 
             board.update(boardRequestDto);
             // 요청받은 DTO 로 DB에 저장할 객체 만들기
-            return new BoardResponseDto(board);
+            return BoardResponseDto.builder()
+                    .title(board.title)
+                    .content(board.content)
+                    .createdAt(board.getCreatedAt())
+                    .id(board.getId())
+                    .modifiedAt(board.getModifiedAt())
+                    .username(board.getUser().getUsername())
+                    .build();
         } else {
             return null;
         }
@@ -120,7 +152,10 @@ public class BoardService {
             );
 
             boardRepository.deleteById(id);
-            return new ResponseMsgDto("게시글 삭제 성공", HttpStatus.OK.value());
+            return ResponseMsgDto.builder()
+                    .msg("게시글 삭제 성공")
+                    .statusCode(HttpStatus.OK.value())
+                    .build();
         } else {
             return null;
         }
