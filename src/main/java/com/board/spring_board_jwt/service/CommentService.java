@@ -55,7 +55,7 @@ public class CommentService {
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
             User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+                    () -> new IllegalArgumentException("ID가 존재하지 않습니다.")
             );
 
             Comment comment = Comment.builder()
@@ -89,20 +89,19 @@ public class CommentService {
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
             User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+                    () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
             );
 
             Comment comment = commentRepository.findById(id).orElseThrow(
-                    () -> new IllegalArgumentException("댓글 ID가 없습니다."));
+                    () -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
             if (Objects.equals(comment.getUser().getId(), user.getId()) || user.getRole().equals(UserRoleEnum.ADMIN)) {
 
                 comment.update(commentRequestDto);
                 return new CommentResponseDto(comment);
             } else {
-                throw new IllegalArgumentException("해당 사용자가 혹은 관리자  아니면 댓글을 수정할 수 없습니다!");
+                throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
             }
-
         }
         return null;
     }
@@ -124,11 +123,11 @@ public class CommentService {
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
             User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+                    () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
             );
 
             Comment comment = commentRepository.findById(id).orElseThrow(() ->
-                    new IllegalArgumentException("삭제하고자 하는 댓글이 없습니다!"));
+                    new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
             if (Objects.equals(comment.getUser().getId(), user.getId()) || user.getRole().equals(UserRoleEnum.ADMIN)) {
 
