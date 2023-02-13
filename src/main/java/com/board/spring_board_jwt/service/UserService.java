@@ -25,7 +25,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public ResponseEntity signup(UserRequestDto userRequestDto) {
+    public ResponseEntity<Object> signup(UserRequestDto userRequestDto) {
         String username = userRequestDto.getUsername();
         String password = userRequestDto.getPassword();
         //중복 회원 에러

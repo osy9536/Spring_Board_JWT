@@ -17,9 +17,6 @@ public class BoardResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    private String msg;
-    private int statusCode;
-
     @Builder
     public BoardResponseDto(Board board) {
         id = board.getId();
@@ -28,11 +25,5 @@ public class BoardResponseDto {
         username = board.getUser().getUsername();
         createdAt = board.getCreatedAt();
         modifiedAt = board.getModifiedAt();
-    }
-
-    @Builder(builderMethodName = "BoardResponseDto_Msg")
-    public BoardResponseDto(ResponseMsgDto responseMsgDto) {
-        msg = responseMsgDto.getMsg();
-        statusCode = responseMsgDto.getStatusCode();
     }
 }

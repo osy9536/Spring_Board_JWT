@@ -27,6 +27,7 @@ public class Comment extends Timestamped{
     @ManyToOne
     @JoinColumn(name = "BOARD_ID", nullable = false)
     private Board board;
+
     @Builder
     public Comment(CommentRequestDto requestDto,User user, Board board) {
         this.comment = requestDto.getComment();

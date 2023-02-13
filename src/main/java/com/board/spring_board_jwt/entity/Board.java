@@ -38,8 +38,4 @@ public class Board extends Timestamped{
         this.content = boardRequestDto.getContent();
         this.title = boardRequestDto.getTitle();
     }
-
-    public void addCommentList(Comment comment) {
-        this.commentList.add(comment);
-    }
 }

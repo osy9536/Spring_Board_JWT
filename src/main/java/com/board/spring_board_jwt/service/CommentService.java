@@ -14,6 +14,7 @@ import com.board.spring_board_jwt.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +33,15 @@ public class CommentService {
     private final JwtUtil jwtUtil;
     private final BoardRepository boardRepository;
 
+    private static ResponseEntity<Object> responseEntity(String msg) {
+        return ResponseEntity.badRequest().body(ResponseMsgDto.builder()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .msg(msg)
+                .build());
+    }
 
     @Transactional
-    public CommentResponseDto createComment(Long id, CommentRequestDto requestDto, HttpServletRequest request) {
+    public ResponseEntity<Object> createComment(Long id, CommentRequestDto requestDto, HttpServletRequest request) {
 
         String token = jwtUtil.resolveToken(request);
         Claims claims;
@@ -50,7 +57,7 @@ public class CommentService {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                throw new IllegalArgumentException("Token Error");
+                return responseEntity("토큰이 유효하지 않습니다.");
             }
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
@@ -64,15 +71,15 @@ public class CommentService {
                     .user(user)
                     .build();
             commentRepository.save(comment);
-            return CommentResponseDto.builder()
+            return ResponseEntity.ok().body(CommentResponseDto.builder()
                     .comment(comment)
-                    .build();
+                    .build());
         }
-        return null;
+        return responseEntity("토큰이 유효하지 않습니다.");
     }
 
     @Transactional
-    public CommentResponseDto update(Long id,CommentRequestDto commentRequestDto, HttpServletRequest request) {
+    public ResponseEntity<Object> update(Long id,CommentRequestDto commentRequestDto, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
         Claims claims;
 
@@ -84,7 +91,7 @@ public class CommentService {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                throw new IllegalArgumentException("Token Error");
+                return responseEntity("토큰이 유효하지 않습니다.");
             }
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
@@ -98,15 +105,15 @@ public class CommentService {
             if (Objects.equals(comment.getUser().getId(), user.getId()) || user.getRole().equals(UserRoleEnum.ADMIN)) {
 
                 comment.update(commentRequestDto);
-                return new CommentResponseDto(comment);
+                return ResponseEntity.ok().body(new CommentResponseDto(comment));
             } else {
-                throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
+                return responseEntity("작성자만 수정할 수 있습니다.");
             }
         }
-        return null;
+        return responseEntity("토큰이 유효하지 않습니다.");
     }
     @Transactional
-    public ResponseMsgDto delete(Long id, HttpServletRequest request) {
+    public ResponseEntity<Object> delete(Long id, HttpServletRequest request) {
 
         String token = jwtUtil.resolveToken(request);
         Claims claims;
@@ -118,7 +125,7 @@ public class CommentService {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                throw new IllegalArgumentException("Token Error");
+                return responseEntity("토큰이 유효하지 않습니다.");
             }
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
@@ -132,16 +139,16 @@ public class CommentService {
             if (Objects.equals(comment.getUser().getId(), user.getId()) || user.getRole().equals(UserRoleEnum.ADMIN)) {
 
                 commentRepository.deleteById(id);
-                return ResponseMsgDto.builder()
+                return ResponseEntity.ok().body(ResponseMsgDto.builder()
                         .msg("댓글 삭제 성공")
                         .statusCode(200)
-                        .build();
+                        .build());
             } else {
-                throw new IllegalArgumentException("작성자만 삭제할 수 있습니다.");
+                return responseEntity("작성자만 삭제할 수 있습니다.");
             }
 
 
         }
-        return null;
+        return responseEntity("토큰이 유효하지 않습니다.");
     }
 }

@@ -6,6 +6,7 @@ import com.board.spring_board_jwt.dto.BoardResponseDto;
 import com.board.spring_board_jwt.dto.ResponseMsgDto;
 import com.board.spring_board_jwt.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class BoardController {
     private final BoardService boardService;
 
     @PostMapping("/post")
-    public BoardResponseDto createBoard(@RequestBody BoardRequestDto boardRequestDto, HttpServletRequest request) {
+    public ResponseEntity<Object> createBoard(@RequestBody BoardRequestDto boardRequestDto, HttpServletRequest request) {
         return boardService.createBoard(boardRequestDto, request);
     }
 
@@ -35,12 +36,12 @@ public class BoardController {
     }
 
     @PutMapping("/post/{id}")
-    public BoardResponseDto updateBoard(@PathVariable Long id, HttpServletRequest request, @RequestBody BoardRequestDto boardRequestDto) {
+    public ResponseEntity<Object> updateBoard(@PathVariable Long id, HttpServletRequest request, @RequestBody BoardRequestDto boardRequestDto) {
         return boardService.updateBoard(id, request, boardRequestDto);
     }
 
     @DeleteMapping("post/{id}")
-    public ResponseMsgDto deleteBoard(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<Object> deleteBoard(@PathVariable Long id, HttpServletRequest request) {
         return boardService.deleteBoard(id, request);
     }
 
