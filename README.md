@@ -64,6 +64,10 @@
 
 </div>
 
+## ERD
+
+![image](https://user-images.githubusercontent.com/76714304/218366473-4367b95f-ea89-4b52-aef5-9094e2d6a3c1.png)
+
 ### 2023.2.13 요구사항 진행도
 
 #### 1. 댓글 작성 API
