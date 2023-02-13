@@ -64,9 +64,19 @@
 
 </div>
 
+------
+
 ## ERD
 
 ![image](https://user-images.githubusercontent.com/76714304/218366473-4367b95f-ea89-4b52-aef5-9094e2d6a3c1.png)
+
+-----
+
+## API 명세서
+
+![image](https://user-images.githubusercontent.com/76714304/218367558-434dcf06-9ec7-4096-882f-e81c0d0e74ae.png)
+
+------
 
 ### 2023.2.13 요구사항 진행도
 
