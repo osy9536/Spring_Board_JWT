@@ -74,7 +74,7 @@
 
 ## API 명세서
 
-![image](https://user-images.githubusercontent.com/76714304/218367558-434dcf06-9ec7-4096-882f-e81c0d0e74ae.png)
+![image](https://user-images.githubusercontent.com/76714304/218369093-53d91275-9c3e-4f6a-90d1-adbcd132265c.png)
 
 ------
 
