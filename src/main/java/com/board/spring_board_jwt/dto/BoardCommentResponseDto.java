@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-public class BoardResponseDto {
+public class BoardCommentResponseDto {
     private Long id;
     private String title;
     private String content;
@@ -17,22 +17,16 @@ public class BoardResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    private String msg;
-    private int statusCode;
-
+    private List<CommentResponseDto> commentList;
     @Builder
-    public BoardResponseDto(Board board) {
+    public BoardCommentResponseDto(Board board,List<CommentResponseDto> commentList) {
         id = board.getId();
         title = board.getTitle();
         content = board.getContent();
         username = board.getUser().getUsername();
         createdAt = board.getCreatedAt();
         modifiedAt = board.getModifiedAt();
+        this.commentList = commentList;
     }
 
-    @Builder(builderMethodName = "BoardResponseDto_Msg")
-    public BoardResponseDto(ResponseMsgDto responseMsgDto) {
-        msg = responseMsgDto.getMsg();
-        statusCode = responseMsgDto.getStatusCode();
-    }
 }

@@ -3,6 +3,7 @@ package com.board.spring_board_jwt.service;
 import com.board.spring_board_jwt.dto.ResponseMsgDto;
 import com.board.spring_board_jwt.dto.UserRequestDto;
 import com.board.spring_board_jwt.entity.User;
+import com.board.spring_board_jwt.entity.UserRoleEnum;
 import com.board.spring_board_jwt.jwt.JwtUtil;
 import com.board.spring_board_jwt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +28,22 @@ public class UserService {
     public ResponseEntity signup(UserRequestDto userRequestDto) {
         String username = userRequestDto.getUsername();
         String password = userRequestDto.getPassword();
-
+        //중복 회원 에러
+        ResponseMsgDto sameUser = ResponseMsgDto.builder()
+                .msg("중복된 username입니다.")
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build();
         // 회원 중복 확인
         Optional<User> found = userRepository.findByUsername(username);
         if (found.isPresent()) {
-            throw new IllegalArgumentException("중복된 회원이 존재합니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(sameUser);
+        }
+        UserRoleEnum role = UserRoleEnum.USER;
+        if (userRequestDto.isAdmin()) {
+            if (!userRequestDto.getAdminToken().equals(ADMIN_TOKEN)) {
+                throw new IllegalArgumentException("관리자 암호가 틀려 등록이 불가능합니다");
+            }
+            role = UserRoleEnum.ADMIN;
         }
         Pattern namePattern = Pattern.compile("^([a-z[0-9]]){4,10}$"); //8자 영문+숫자
         Matcher nameMatcher = namePattern.matcher(username);
@@ -54,6 +66,7 @@ public class UserService {
             User user = User.builder()
                     .username(username)
                     .password(password)
+                    .role(role)
                     .build();
             userRepository.save(user);
             ResponseMsgDto ok = ResponseMsgDto.builder()
@@ -67,10 +80,15 @@ public class UserService {
     public ResponseEntity<Object> login(UserRequestDto userRequestDto, HttpServletResponse response) {
         String username = userRequestDto.getUsername();
         String password = userRequestDto.getPassword();
+        ResponseMsgDto noUser = ResponseMsgDto.builder()
+                .msg("회원을 찾을 수 없습니다.")
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build();
 
-        User user = userRepository.findByUsername(username).orElseThrow(
-            ()-> new IllegalArgumentException("등록된 사용자가 없습니다.")
-        );
+        if (userRepository.findByUsername(username).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noUser);
+        }
+        User user = userRepository.findByUsername(username).get();
         if(!user.getPassword().equals(password)){
             throw  new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }

@@ -1,5 +1,6 @@
 package com.board.spring_board_jwt.controller;
 
+import com.board.spring_board_jwt.dto.BoardCommentResponseDto;
 import com.board.spring_board_jwt.dto.BoardRequestDto;
 import com.board.spring_board_jwt.dto.BoardResponseDto;
 import com.board.spring_board_jwt.dto.ResponseMsgDto;
@@ -24,12 +25,12 @@ public class BoardController {
     }
 
     @GetMapping("/posts")
-    public List<BoardResponseDto> getBoards() {
+    public List<BoardCommentResponseDto> getBoards() {
         return boardService.getBoards();
     }
 
     @GetMapping("/post/{id}")
-    public BoardResponseDto getIdBoard(@PathVariable Long id) {
+    public BoardCommentResponseDto getIdBoard(@PathVariable Long id) {
         return boardService.getIdBoard(id);
     }
 
