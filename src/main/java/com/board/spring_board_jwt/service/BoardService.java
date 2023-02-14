@@ -10,13 +10,9 @@ import com.board.spring_board_jwt.repository.BoardRepository;
 import com.board.spring_board_jwt.repository.CommentRepository;
 import com.board.spring_board_jwt.repository.UserRepository;
 import io.jsonwebtoken.Claims;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -25,12 +21,18 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@RequiredArgsConstructor
 public class BoardService {
     private final JwtUtil jwtUtil;
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+
+    public BoardService(JwtUtil jwtUtil, BoardRepository boardRepository, UserRepository userRepository, CommentRepository commentRepository) {
+        this.jwtUtil = jwtUtil;
+        this.boardRepository = boardRepository;
+        this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
+    }
 
     private static ResponseEntity<Object> responseEntity(String msg) {
         return ResponseEntity.badRequest().body(ResponseMsgDto.builder()
@@ -42,31 +44,29 @@ public class BoardService {
     @Transactional
     public ResponseEntity<Object> createBoard(BoardRequestDto boardRequestDto, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
-        Claims claims;
-        if (token != null) {
-            if (jwtUtil.validateToken(token)) {
-                // 토큰에서 사용자 정보 가져오기
-                claims = jwtUtil.getUserInfoFromToken(token);
-            } else {
-                return responseEntity("토큰이 유효하지 않습니다.");
-            }
-
-            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
-
-            Board b = Board.builder()
-                    .boardRequestDto(boardRequestDto)
-                    .user(user)
-                    .build();
-
-            // 요청받은 DTO 로 DB에 저장할 객체 만들기
-            boardRepository.save(b);
-            return ResponseEntity.ok().body(BoardResponseDto.builder().board(b).build());
-        } else {
+        if (token == null) {
             return responseEntity("토큰이 유효하지 않습니다.");
         }
+        if (!jwtUtil.validateToken(token)) {
+            return responseEntity("토큰이 유효하지 않습니다.");
+        }
+
+        // 토큰에서 사용자 정보 가져오기
+        Claims claims = jwtUtil.getUserInfoFromToken(token);
+
+        // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+        User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+        );
+
+        Board b = Board.builder()
+                .boardRequestDto(boardRequestDto)
+                .user(user)
+                .build();
+
+        // 요청받은 DTO 로 DB에 저장할 객체 만들기
+        boardRepository.save(b);
+        return ResponseEntity.ok().body(BoardResponseDto.builder().board(b).build());
     }
 
     @Transactional

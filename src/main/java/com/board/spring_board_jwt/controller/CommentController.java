@@ -1,15 +1,12 @@
 package com.board.spring_board_jwt.controller;
 
 import com.board.spring_board_jwt.dto.CommentRequestDto;
-import com.board.spring_board_jwt.dto.CommentResponseDto;
-import com.board.spring_board_jwt.dto.ResponseMsgDto;
 import com.board.spring_board_jwt.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
