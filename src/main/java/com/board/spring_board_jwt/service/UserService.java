@@ -96,7 +96,7 @@ public class UserService {
                 .msg("로그인 완료!")
                 .statusCode(HttpStatus.OK.value())
                 .build();
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername()));
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(),user.getRole()));
         return ResponseEntity.status(HttpStatus.OK).body(responseMsgDto);
     }
 }

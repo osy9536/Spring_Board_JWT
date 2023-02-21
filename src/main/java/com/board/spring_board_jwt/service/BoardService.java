@@ -42,23 +42,7 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<Object> createBoard(BoardRequestDto boardRequestDto, HttpServletRequest request) {
-        String token = jwtUtil.resolveToken(request);
-        if (token == null) {
-            return responseEntity("토큰이 유효하지 않습니다.");
-        }
-        if (!jwtUtil.validateToken(token)) {
-            return responseEntity("토큰이 유효하지 않습니다.");
-        }
-
-        // 토큰에서 사용자 정보 가져오기
-        Claims claims = jwtUtil.getUserInfoFromToken(token);
-
-        // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-        User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-        );
-
+    public ResponseEntity<Object> createBoard(BoardRequestDto boardRequestDto, User user) {
         Board b = Board.builder()
                 .boardRequestDto(boardRequestDto)
                 .user(user)
@@ -74,7 +58,6 @@ public class BoardService {
         List<Board> boards = boardRepository.findAllByOrderByCreatedAtDesc();
         List<BoardCommentResponseDto> boardResponseDto = new ArrayList<>();
         List<Comment> allCommentList = commentRepository.findAllByOrderByCreatedAtDesc();
-
 
         for (Board b : boards) {
             List<CommentResponseDto> commentResponseDto1 = new ArrayList<>();
@@ -112,76 +95,40 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<Object> updateBoard(Long id, HttpServletRequest request, BoardRequestDto boardRequestDto) {
-        String token = jwtUtil.resolveToken(request);
-        Claims claims;
+    public ResponseEntity<Object> updateBoard(Long id, User user, BoardRequestDto boardRequestDto) {
 
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
-        if (token != null) {
-            if (jwtUtil.validateToken(token)) {
-                // 토큰에서 사용자 정보 가져오기
-                claims = jwtUtil.getUserInfoFromToken(token);
-            } else {
-                return responseEntity("토큰이 유효하지 않습니다.");
-            }
-            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
-            if (Objects.equals(user.getId(), board.getUser().getId()) || user.getRole() == UserRoleEnum.ADMIN) {
-                board.update(boardRequestDto);
-                // 요청받은 DTO 로 DB에 저장할 객체 만들기
-                return ResponseEntity.ok().body(BoardResponseDto.builder()
-                        .board(board)
-                        .build());
-            } else {
-                return responseEntity("작성자만 수정할 수 있습니다");
 
-            }
-
+        if (Objects.equals(user.getId(), board.getUser().getId()) || user.getRole() == UserRoleEnum.ADMIN) {
+            board.update(boardRequestDto);
+            // 요청받은 DTO 로 DB에 저장할 객체 만들기
+            return ResponseEntity.ok().body(BoardResponseDto.builder()
+                    .board(board)
+                    .build());
         } else {
-            return responseEntity("토큰이 유효하지 않습니다.");
+            return responseEntity("작성자만 수정할 수 있습니다");
         }
     }
 
     @Transactional
-    public ResponseEntity<Object> deleteBoard(Long id, HttpServletRequest request) {
-        String token = jwtUtil.resolveToken(request);
-        Claims claims;
+    public ResponseEntity<Object> deleteBoard(Long id, User user) {
 
-        if (token != null) {
-            if (jwtUtil.validateToken(token)) {
-                // 토큰에서 사용자 정보 가져오기
-                claims = jwtUtil.getUserInfoFromToken(token);
-            } else {
-                return responseEntity("토큰이 유효하지 않습니다.");
-            }
-
-            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
-            Board board = boardRepository.findById(id).orElseThrow(
-                    () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
-            );
-            if (Objects.equals(user.getId(), board.getUser().getId()) || user.getRole() == UserRoleEnum.ADMIN) {
-                boardRepository.deleteById(id);
-                return ResponseEntity.ok().body(ResponseMsgDto.builder()
-                        .msg("게시글 삭제 성공")
-                        .statusCode(HttpStatus.OK.value())
-                        .build());
-            } else {
-                return ResponseEntity.ok().body(ResponseMsgDto.builder()
-                        .msg("작성자만 삭제할 수 있습니다.")
-                        .statusCode(HttpStatus.BAD_REQUEST.value())
-                        .build());
-
-            }
-
+        Board board = boardRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
+        );
+        if (Objects.equals(user.getId(), board.getUser().getId()) || user.getRole() == UserRoleEnum.ADMIN) {
+            boardRepository.deleteById(id);
+            return ResponseEntity.ok().body(ResponseMsgDto.builder()
+                    .msg("게시글 삭제 성공")
+                    .statusCode(HttpStatus.OK.value())
+                    .build());
         } else {
-            return responseEntity("토큰이 유효하지 않습니다.");
+            return ResponseEntity.ok().body(ResponseMsgDto.builder()
+                    .msg("작성자만 삭제할 수 있습니다.")
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .build());
         }
     }
 }

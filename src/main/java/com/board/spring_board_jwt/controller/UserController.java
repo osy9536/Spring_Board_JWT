@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
 
