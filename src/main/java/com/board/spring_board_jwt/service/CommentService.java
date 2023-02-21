@@ -52,6 +52,7 @@ public class CommentService {
                 .user(user)
                 .build();
         commentRepository.save(comment);
+        board.getCommentList().add(comment);
         return ResponseEntity.ok().body(CommentResponseDto.builder()
                 .comment(comment)
                 .build());

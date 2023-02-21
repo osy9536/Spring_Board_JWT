@@ -9,6 +9,7 @@ import com.board.spring_board_jwt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
@@ -23,11 +24,12 @@ public class UserService {
     private static final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public ResponseEntity<Object> signup(UserRequestDto userRequestDto) {
         String username = userRequestDto.getUsername();
-        String password = userRequestDto.getPassword();
+        String password = passwordEncoder.encode(userRequestDto.getPassword());
         //중복 회원 에러
         ResponseMsgDto sameUser = ResponseMsgDto.builder()
                 .msg("중복된 username입니다.")
@@ -45,11 +47,11 @@ public class UserService {
             }
             role = UserRoleEnum.ADMIN;
         }
-        Pattern namePattern = Pattern.compile("^([a-z[0-9]]){4,10}$"); //8자 영문+숫자
+        Pattern namePattern = Pattern.compile("^([a-z[0-9]]){4,10}$"); //4자 영문+숫자
         Matcher nameMatcher = namePattern.matcher(username);
 
         Pattern pwPattern = Pattern.compile("^([a-zA-Z[0-9]]){8,15}$"); //8자 영문+숫자
-        Matcher pwMatcher = pwPattern.matcher(password);
+        Matcher pwMatcher = pwPattern.matcher(userRequestDto.getPassword());
         ResponseMsgDto noName = ResponseMsgDto.builder()
                 .msg("아이디는 4자 이상의 영소문자, 숫자만 가능합니다.")
                 .statusCode(HttpStatus.BAD_REQUEST.value())
@@ -89,7 +91,7 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noUser);
         }
         User user = userRepository.findByUsername(username).get();
-        if(!user.getPassword().equals(password)){
+        if(!passwordEncoder.matches(password,user.getPassword())){
             throw  new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         ResponseMsgDto responseMsgDto = ResponseMsgDto.builder()

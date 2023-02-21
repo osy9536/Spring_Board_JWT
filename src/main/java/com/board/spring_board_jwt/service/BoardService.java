@@ -5,39 +5,30 @@ import com.board.spring_board_jwt.entity.Board;
 import com.board.spring_board_jwt.entity.Comment;
 import com.board.spring_board_jwt.entity.User;
 import com.board.spring_board_jwt.entity.UserRoleEnum;
-import com.board.spring_board_jwt.jwt.JwtUtil;
 import com.board.spring_board_jwt.repository.BoardRepository;
-import com.board.spring_board_jwt.repository.CommentRepository;
-import com.board.spring_board_jwt.repository.UserRepository;
-import io.jsonwebtoken.Claims;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
 @Service
 public class BoardService {
-    private final JwtUtil jwtUtil;
     private final BoardRepository boardRepository;
-    private final UserRepository userRepository;
-    private final CommentRepository commentRepository;
 
-    public BoardService(JwtUtil jwtUtil, BoardRepository boardRepository, UserRepository userRepository, CommentRepository commentRepository) {
-        this.jwtUtil = jwtUtil;
+    public BoardService(BoardRepository boardRepository) {
         this.boardRepository = boardRepository;
-        this.userRepository = userRepository;
-        this.commentRepository = commentRepository;
     }
 
-    private static ResponseEntity<Object> responseEntity(String msg) {
+
+    private static ResponseEntity<Object> responseEntity() {
         return ResponseEntity.badRequest().body(ResponseMsgDto.builder()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .msg(msg)
+                .msg("작성자만 수정할 수 있습니다")
                 .build());
     }
 
@@ -57,15 +48,11 @@ public class BoardService {
     public List<BoardCommentResponseDto> getBoards() {
         List<Board> boards = boardRepository.findAllByOrderByCreatedAtDesc();
         List<BoardCommentResponseDto> boardResponseDto = new ArrayList<>();
-        List<Comment> allCommentList = commentRepository.findAllByOrderByCreatedAtDesc();
-
         for (Board b : boards) {
+            b.getCommentList().sort(Comparator.comparing(Comment::getCreatedAt).reversed());
             List<CommentResponseDto> commentResponseDto1 = new ArrayList<>();
-            for (Comment c : allCommentList) {
-                if (Objects.equals(b.getId(), c.getBoard().getId())) {
-                    CommentResponseDto commentResponseDto = new CommentResponseDto(c);
-                    commentResponseDto1.add(commentResponseDto);
-                }
+            for (Comment c : b.getCommentList()) {
+                commentResponseDto1.add(new CommentResponseDto(c));
             }
             boardResponseDto.add(BoardCommentResponseDto.builder()
                     .board(b)
@@ -80,13 +67,10 @@ public class BoardService {
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
-        List<Comment> allCommentList = commentRepository.findAllByOrderByCreatedAtDesc();
+        board.getCommentList().sort(Comparator.comparing(Comment::getCreatedAt).reversed());
         List<CommentResponseDto> commentResponseDto1 = new ArrayList<>();
-        for (Comment c : allCommentList) {
-            if (Objects.equals(board.getId(), c.getBoard().getId())) {
-                CommentResponseDto commentResponseDto = new CommentResponseDto(c);
-                commentResponseDto1.add(commentResponseDto);
-            }
+        for (Comment c : board.getCommentList()) {
+                commentResponseDto1.add(new CommentResponseDto(c));
         }
         return BoardCommentResponseDto.builder()
                 .commentList(commentResponseDto1)
@@ -108,7 +92,7 @@ public class BoardService {
                     .board(board)
                     .build());
         } else {
-            return responseEntity("작성자만 수정할 수 있습니다");
+            return responseEntity();
         }
     }
 
