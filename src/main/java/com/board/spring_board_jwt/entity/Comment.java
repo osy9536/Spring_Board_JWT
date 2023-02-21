@@ -29,6 +29,13 @@ public class Comment extends Timestamped{
     @JoinColumn(name = "BOARD_ID", nullable = false)
     private Board board;
 
+    public void setBoard(Board board) {
+        if (this.board != null) {
+            this.board.getCommentList().remove(this);
+        }
+        this.board = board;
+        board.getCommentList().add(this);
+    }
     @Builder
     public Comment(CommentRequestDto requestDto,User user, Board board) {
         this.comment = requestDto.getComment();
