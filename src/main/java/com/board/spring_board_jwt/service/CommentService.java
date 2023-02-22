@@ -39,7 +39,7 @@ public class CommentService {
     }
 
     @Transactional
-    public ResponseEntity<Object> createComment(Long id, CommentRequestDto requestDto, User user) {
+    public ResponseEntity<Object> createComment(User user, Long id, CommentRequestDto requestDto) {
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("게시글이 존재하지 않습니다.")
         );
@@ -57,7 +57,7 @@ public class CommentService {
     }
 
     @Transactional
-    public ResponseEntity<Object> update(Long id, CommentRequestDto commentRequestDto, User user) {
+    public ResponseEntity<Object> update(User user,Long id, CommentRequestDto commentRequestDto) {
         Comment comment = commentRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
@@ -71,7 +71,7 @@ public class CommentService {
     }
 
     @Transactional
-    public ResponseEntity<Object> delete(Long id, User user) {
+    public ResponseEntity<Object> delete(User user, Long id) {
         Comment comment = commentRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("댓글이 존재하지 않습니다."));
 

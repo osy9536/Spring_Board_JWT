@@ -17,16 +17,16 @@ public class CommentController {
     @PostMapping("/{boardId}/comment")
     public ResponseEntity<Object> createComment(@PathVariable Long boardId, @RequestBody CommentRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
 
-        return commentService.createComment(boardId,requestDto,userDetails.getUser());
+        return commentService.createComment(userDetails.getUser(), boardId, requestDto);
     }
 
     @PutMapping("/comment/{id}")
     public ResponseEntity<Object> updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return commentService.update(id,commentRequestDto,userDetails.getUser());
+        return commentService.update(userDetails.getUser(), id, commentRequestDto);
     }
 
     @DeleteMapping("/comment/{id}")
     public ResponseEntity<Object> deleteComment(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return commentService.delete(id,userDetails.getUser());
+        return commentService.delete(userDetails.getUser(), id);
     }
 }

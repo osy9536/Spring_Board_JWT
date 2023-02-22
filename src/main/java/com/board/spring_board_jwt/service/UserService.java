@@ -70,11 +70,17 @@ public class UserService {
                 .msg("회원을 찾을 수 없습니다.")
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .build();
-
+        ResponseMsgDto withdrawUser = ResponseMsgDto.builder()
+                .msg("탈퇴한 회원입니다.")
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build();
         if (userRepository.findByUsername(username).isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noUser);
         }
         User user = userRepository.findByUsername(username).get();
+        if (user.isWithdrawal()) { //탈퇴 회원 검증
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(withdrawUser);
+        }
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
@@ -84,5 +90,36 @@ public class UserService {
                 .build();
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(), user.getRole()));
         return ResponseEntity.status(HttpStatus.OK).body(responseMsgDto);
+    }
+    @Transactional
+    public ResponseEntity<Object> withdrawal(UserRequestDto userRequestDto, HttpServletResponse response) {
+        String username = userRequestDto.getUsername();
+        String password = userRequestDto.getPassword();
+        ResponseMsgDto noUser = ResponseMsgDto.builder()
+                .msg("회원을 찾을 수 없습니다.")
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build();
+
+        if (userRepository.findByUsername(username).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noUser);
+        }
+        User user = userRepository.findByUsername(username).get();
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+        ResponseMsgDto responseMsgDto = ResponseMsgDto.builder()
+                .msg("계정 탈퇴 성공")
+                .statusCode(HttpStatus.OK.value())
+                .build();
+        ResponseMsgDto responseMsgDto2 = ResponseMsgDto.builder()
+                .msg("계정 복구 성공")
+                .statusCode(HttpStatus.OK.value())
+                .build();
+        user.changeWithdrawal();
+        if (user.isWithdrawal()) {
+            return ResponseEntity.status(HttpStatus.OK).body(responseMsgDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(responseMsgDto2);
+        }
     }
 }

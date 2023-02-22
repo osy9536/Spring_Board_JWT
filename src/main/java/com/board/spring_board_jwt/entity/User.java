@@ -18,6 +18,9 @@ public class User {
     private String password;
 
     @Column(nullable = false)
+    private boolean withdrawal=false;
+
+    @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
 
@@ -26,5 +29,9 @@ public class User {
         this.username = username;
         this.password = password;
         this.role = role;
+    }
+
+    public void changeWithdrawal() {
+        withdrawal = !withdrawal;
     }
 }

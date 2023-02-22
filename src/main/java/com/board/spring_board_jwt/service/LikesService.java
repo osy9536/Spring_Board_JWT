@@ -20,7 +20,7 @@ public class LikesService {
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
 
-    public ResponseEntity<Object> boardLike(Long boardId, User user) {
+    public ResponseEntity<Object> boardLike(User user, Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
@@ -47,7 +47,7 @@ public class LikesService {
         }
     }
 
-    public ResponseEntity<Object> commentLike(Long commentId, User user) {
+    public ResponseEntity<Object> commentLike(User user, Long commentId ) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );

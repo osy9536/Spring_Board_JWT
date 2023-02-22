@@ -25,4 +25,9 @@ public class UserController {
     public ResponseEntity<Object> login(@RequestBody UserRequestDto userRequestDto, HttpServletResponse response) {
         return userService.login(userRequestDto, response);
     }
+
+    @PostMapping("/withdrawal")
+    public ResponseEntity<Object> withdrawal(@RequestBody UserRequestDto userRequestDto, HttpServletResponse response) {
+        return userService.withdrawal (userRequestDto, response);
+    }
 }

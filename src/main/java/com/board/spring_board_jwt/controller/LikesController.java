@@ -15,11 +15,11 @@ public class LikesController {
     private final LikesService likesService;
     @PostMapping("/post/like/{boardId}")
     public ResponseEntity<Object> boardLike(@PathVariable Long boardId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return likesService.boardLike(boardId, userDetails.getUser());
+        return likesService.boardLike(userDetails.getUser(), boardId);
     }
 
     @PostMapping("/comment/like/{commentId}")
     public ResponseEntity<Object> commentLike(@PathVariable Long commentId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return likesService.commentLike(commentId, userDetails.getUser());
+        return likesService.commentLike(userDetails.getUser(), commentId);
     }
 }

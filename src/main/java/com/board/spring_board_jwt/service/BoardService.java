@@ -33,7 +33,7 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<Object> createBoard(BoardRequestDto boardRequestDto, User user) {
+    public ResponseEntity<Object> createBoard( User user,BoardRequestDto boardRequestDto) {
         Board b = Board.builder()
                 .boardRequestDto(boardRequestDto)
                 .user(user)
@@ -79,7 +79,7 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<Object> updateBoard(Long id, User user, BoardRequestDto boardRequestDto) {
+    public ResponseEntity<Object> updateBoard(User user,Long id,  BoardRequestDto boardRequestDto) {
 
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
@@ -97,7 +97,7 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<Object> deleteBoard(Long id, User user) {
+    public ResponseEntity<Object> deleteBoard(User user,Long id ) {
 
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")

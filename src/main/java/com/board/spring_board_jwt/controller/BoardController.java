@@ -20,7 +20,7 @@ public class BoardController {
 
     @PostMapping("/post")
     public ResponseEntity<Object> createBoard(@RequestBody BoardRequestDto boardRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return boardService.createBoard(boardRequestDto, userDetails.getUser());
+        return boardService.createBoard(userDetails.getUser(), boardRequestDto);
     }
 
     @GetMapping("/posts")
@@ -35,12 +35,12 @@ public class BoardController {
 
     @PutMapping("/post/{id}")
     public ResponseEntity<Object> updateBoard(@PathVariable Long id,@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody BoardRequestDto boardRequestDto) {
-        return boardService.updateBoard(id, userDetails.getUser(), boardRequestDto);
+        return boardService.updateBoard(userDetails.getUser(), id, boardRequestDto);
     }
 
     @DeleteMapping("post/{id}")
     public ResponseEntity<Object> deleteBoard(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return boardService.deleteBoard(id, userDetails.getUser());
+        return boardService.deleteBoard(userDetails.getUser(), id);
     }
 
 }
