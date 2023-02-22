@@ -149,7 +149,7 @@
 
 ## API 명세서
 
-![image](https://user-images.githubusercontent.com/76714304/220530188-86592328-0db1-40da-aa17-7cf3716a4893.png)
+![image](https://user-images.githubusercontent.com/76714304/220530888-a7ffa6fe-8eb5-4b4c-8314-ad54b6cee520.png)
 
 ------
 
