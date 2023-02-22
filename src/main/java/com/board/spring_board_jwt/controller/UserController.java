@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 @Controller
 @RequiredArgsConstructor
@@ -16,7 +17,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity signup(@RequestBody UserRequestDto userRequestDto) {
+    public ResponseEntity signup(@Valid @RequestBody UserRequestDto userRequestDto) {
         return userService.signup(userRequestDto);
     }
 

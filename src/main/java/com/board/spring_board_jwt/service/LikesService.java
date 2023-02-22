@@ -31,10 +31,19 @@ public class LikesService {
                     .user(user)
                     .build();
             likesRepository.save(likes);
-            return ResponseEntity.status(HttpStatus.OK).body("좋아요 성공!");
+
+            ResponseMsgDto ok = ResponseMsgDto.builder()
+                    .msg("좋아요 성공!")
+                    .statusCode(HttpStatus.OK.value())
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(ok);
         } else {
             likesRepository.delete(likesBoardUser);
-            return ResponseEntity.status(HttpStatus.OK).body("좋아요 취소 성공!");
+            ResponseMsgDto ok = ResponseMsgDto.builder()
+                    .msg("좋아요 성공!")
+                    .statusCode(HttpStatus.OK.value())
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(ok);
         }
     }
 

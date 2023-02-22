@@ -47,37 +47,21 @@ public class UserService {
             }
             role = UserRoleEnum.ADMIN;
         }
-        Pattern namePattern = Pattern.compile("^([a-z[0-9]]){4,10}$"); //4자 영문+숫자
-        Matcher nameMatcher = namePattern.matcher(username);
 
-        Pattern pwPattern = Pattern.compile("^([a-zA-Z[0-9]]){8,15}$"); //8자 영문+숫자
-        Matcher pwMatcher = pwPattern.matcher(userRequestDto.getPassword());
-        ResponseMsgDto noName = ResponseMsgDto.builder()
-                .msg("아이디는 4자 이상의 영소문자, 숫자만 가능합니다.")
-                .statusCode(HttpStatus.BAD_REQUEST.value())
+        User user = User.builder()
+                .username(username)
+                .password(password)
+                .role(role)
                 .build();
-        ResponseMsgDto noPw = ResponseMsgDto.builder()
-                .msg("비밀번호는 8자 이상의 영대소문자, 숫자만 가능합니다.")
-                .statusCode(HttpStatus.BAD_REQUEST.value())
+        userRepository.save(user);
+        ResponseMsgDto ok = ResponseMsgDto.builder()
+                .msg("회원가입 완료!")
+                .statusCode(HttpStatus.OK.value())
                 .build();
-        if (!pwMatcher.find()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noPw);
-        } else if (!nameMatcher.find()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noName);
-        } else {
-            User user = User.builder()
-                    .username(username)
-                    .password(password)
-                    .role(role)
-                    .build();
-            userRepository.save(user);
-            ResponseMsgDto ok = ResponseMsgDto.builder()
-                    .msg("회원가입 완료!")
-                    .statusCode(HttpStatus.OK.value())
-                    .build();
-            return ResponseEntity.status(HttpStatus.OK).body(ok);
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(ok);
     }
+
+
     @Transactional
     public ResponseEntity<Object> login(UserRequestDto userRequestDto, HttpServletResponse response) {
         String username = userRequestDto.getUsername();
@@ -91,14 +75,14 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noUser);
         }
         User user = userRepository.findByUsername(username).get();
-        if(!passwordEncoder.matches(password,user.getPassword())){
-            throw  new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         ResponseMsgDto responseMsgDto = ResponseMsgDto.builder()
                 .msg("로그인 완료!")
                 .statusCode(HttpStatus.OK.value())
                 .build();
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(),user.getRole()));
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(), user.getRole()));
         return ResponseEntity.status(HttpStatus.OK).body(responseMsgDto);
     }
 }
