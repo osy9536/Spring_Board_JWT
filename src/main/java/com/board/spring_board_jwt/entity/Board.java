@@ -1,9 +1,10 @@
 package com.board.spring_board_jwt.entity;
 
 import com.board.spring_board_jwt.dto.BoardRequestDto;
-import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;

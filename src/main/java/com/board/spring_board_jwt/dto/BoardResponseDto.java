@@ -1,7 +1,6 @@
 package com.board.spring_board_jwt.dto;
 
 import com.board.spring_board_jwt.entity.Board;
-import com.board.spring_board_jwt.entity.Comment;
 import lombok.Builder;
 import lombok.Getter;
 

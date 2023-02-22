@@ -1,8 +1,10 @@
 package com.board.spring_board_jwt.service;
 
-import com.board.spring_board_jwt.dto.BoardRequestDto;
 import com.board.spring_board_jwt.dto.ResponseMsgDto;
-import com.board.spring_board_jwt.entity.*;
+import com.board.spring_board_jwt.entity.Board;
+import com.board.spring_board_jwt.entity.Comment;
+import com.board.spring_board_jwt.entity.Likes;
+import com.board.spring_board_jwt.entity.User;
 import com.board.spring_board_jwt.repository.BoardRepository;
 import com.board.spring_board_jwt.repository.CommentRepository;
 import com.board.spring_board_jwt.repository.LikesRepository;
@@ -11,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-
 @Service
 @RequiredArgsConstructor
 public class LikesService {
@@ -20,7 +20,7 @@ public class LikesService {
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
 
-    public ResponseEntity<Object> boardLike(User user, Long boardId) {
+    public ResponseMsgDto boardLike(User user, Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
@@ -31,23 +31,20 @@ public class LikesService {
                     .user(user)
                     .build();
             likesRepository.save(likes);
-
-            ResponseMsgDto ok = ResponseMsgDto.builder()
+            return ResponseMsgDto.builder()
                     .msg("좋아요 성공!")
                     .statusCode(HttpStatus.OK.value())
                     .build();
-            return ResponseEntity.status(HttpStatus.OK).body(ok);
         } else {
             likesRepository.delete(likesBoardUser);
-            ResponseMsgDto ok = ResponseMsgDto.builder()
-                    .msg("좋아요 성공!")
+            return ResponseMsgDto.builder()
+                    .msg("좋아요 취소 성공!")
                     .statusCode(HttpStatus.OK.value())
                     .build();
-            return ResponseEntity.status(HttpStatus.OK).body(ok);
         }
     }
 
-    public ResponseEntity<Object> commentLike(User user, Long commentId ) {
+    public ResponseMsgDto commentLike(User user, Long commentId ) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
@@ -58,18 +55,16 @@ public class LikesService {
                     .user(user)
                     .build();
             likesRepository.save(likes);
-            ResponseMsgDto ok = ResponseMsgDto.builder()
+            return ResponseMsgDto.builder()
                     .msg("좋아요 성공!")
                     .statusCode(HttpStatus.OK.value())
                     .build();
-            return ResponseEntity.status(HttpStatus.OK).body(ok);
         } else {
             likesRepository.delete(likesCommentUser);
-            ResponseMsgDto ok = ResponseMsgDto.builder()
+            return ResponseMsgDto.builder()
                     .msg("좋아요 취소 성공!")
                     .statusCode(HttpStatus.OK.value())
                     .build();
-            return ResponseEntity.status(HttpStatus.OK).body("ok");
         }
     }
 }

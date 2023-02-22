@@ -6,6 +6,7 @@ import com.board.spring_board_jwt.entity.Comment;
 import com.board.spring_board_jwt.entity.User;
 import com.board.spring_board_jwt.entity.UserRoleEnum;
 import com.board.spring_board_jwt.repository.BoardRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,23 +18,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class BoardService {
     private final BoardRepository boardRepository;
 
-    public BoardService(BoardRepository boardRepository) {
-        this.boardRepository = boardRepository;
-    }
-
-
-    private static ResponseEntity<Object> responseEntity() {
-        return ResponseEntity.badRequest().body(ResponseMsgDto.builder()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .msg("작성자만 수정할 수 있습니다")
-                .build());
-    }
-
     @Transactional
-    public ResponseEntity<Object> createBoard( User user,BoardRequestDto boardRequestDto) {
+    public BoardResponseDto createBoard( User user,BoardRequestDto boardRequestDto) {
         Board b = Board.builder()
                 .boardRequestDto(boardRequestDto)
                 .user(user)
@@ -41,7 +31,7 @@ public class BoardService {
 
         // 요청받은 DTO 로 DB에 저장할 객체 만들기
         boardRepository.save(b);
-        return ResponseEntity.ok().body(BoardResponseDto.builder().board(b).build());
+        return BoardResponseDto.builder().board(b).build();
     }
 
     @Transactional
@@ -79,7 +69,7 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<Object> updateBoard(User user,Long id,  BoardRequestDto boardRequestDto) {
+    public BoardResponseDto updateBoard(User user,Long id,  BoardRequestDto boardRequestDto) {
 
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
@@ -88,31 +78,31 @@ public class BoardService {
         if (Objects.equals(user.getId(), board.getUser().getId()) || user.getRole() == UserRoleEnum.ADMIN) {
             board.update(boardRequestDto);
             // 요청받은 DTO 로 DB에 저장할 객체 만들기
-            return ResponseEntity.ok().body(BoardResponseDto.builder()
+            return BoardResponseDto.builder()
                     .board(board)
-                    .build());
+                    .build();
         } else {
-            return responseEntity();
+            throw new IllegalArgumentException("작성자만 수정할 수 있습니다");
         }
     }
 
     @Transactional
-    public ResponseEntity<Object> deleteBoard(User user,Long id ) {
+    public ResponseMsgDto deleteBoard(User user,Long id ) {
 
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
         if (Objects.equals(user.getId(), board.getUser().getId()) || user.getRole() == UserRoleEnum.ADMIN) {
             boardRepository.deleteById(id);
-            return ResponseEntity.ok().body(ResponseMsgDto.builder()
+            return ResponseMsgDto.builder()
                     .msg("게시글 삭제 성공")
                     .statusCode(HttpStatus.OK.value())
-                    .build());
+                    .build();
         } else {
-            return ResponseEntity.ok().body(ResponseMsgDto.builder()
+            return ResponseMsgDto.builder()
                     .msg("작성자만 삭제할 수 있습니다.")
                     .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .build());
+                    .build();
         }
     }
 }

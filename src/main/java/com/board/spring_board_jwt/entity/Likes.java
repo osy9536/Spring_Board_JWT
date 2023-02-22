@@ -1,15 +1,11 @@
 package com.board.spring_board_jwt.entity;
 
-import com.board.spring_board_jwt.dto.ResponseMsgDto;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @Getter
 @Entity

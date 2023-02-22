@@ -7,23 +7,15 @@ import com.board.spring_board_jwt.entity.Board;
 import com.board.spring_board_jwt.entity.Comment;
 import com.board.spring_board_jwt.entity.User;
 import com.board.spring_board_jwt.entity.UserRoleEnum;
-import com.board.spring_board_jwt.jwt.JwtUtil;
 import com.board.spring_board_jwt.repository.BoardRepository;
 import com.board.spring_board_jwt.repository.CommentRepository;
-import com.board.spring_board_jwt.repository.UserRepository;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +31,7 @@ public class CommentService {
     }
 
     @Transactional
-    public ResponseEntity<Object> createComment(User user, Long id, CommentRequestDto requestDto) {
+    public CommentResponseDto createComment(User user, Long id, CommentRequestDto requestDto) {
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("게시글이 존재하지 않습니다.")
         );
@@ -51,39 +43,39 @@ public class CommentService {
         commentRepository.save(comment);
         //연관관계 편의 메서드 작성
         comment.setBoard(board);
-        return ResponseEntity.ok().body(CommentResponseDto.builder()
+        return CommentResponseDto.builder()
                 .comment(comment)
-                .build());
+                .build();
     }
 
     @Transactional
-    public ResponseEntity<Object> update(User user,Long id, CommentRequestDto commentRequestDto) {
+    public CommentResponseDto update(User user,Long id, CommentRequestDto commentRequestDto) {
         Comment comment = commentRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
         if (Objects.equals(comment.getUser().getId(), user.getId()) || user.getRole().equals(UserRoleEnum.ADMIN)) {
 
             comment.update(commentRequestDto);
-            return ResponseEntity.ok().body(new CommentResponseDto(comment));
+            return new CommentResponseDto(comment);
         } else {
-            return responseEntity("작성자만 수정할 수 있습니다.");
+            throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
         }
     }
 
     @Transactional
-    public ResponseEntity<Object> delete(User user, Long id) {
+    public ResponseMsgDto delete(User user, Long id) {
         Comment comment = commentRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
         if (Objects.equals(comment.getUser().getId(), user.getId()) || user.getRole().equals(UserRoleEnum.ADMIN)) {
 
             commentRepository.deleteById(id);
-            return ResponseEntity.ok().body(ResponseMsgDto.builder()
+            return ResponseMsgDto.builder()
                     .msg("댓글 삭제 성공")
                     .statusCode(200)
-                    .build());
+                    .build();
         } else {
-            return responseEntity("작성자만 삭제할 수 있습니다.");
+            throw new IllegalArgumentException("작성자만 삭제할 수 있습니다.");
         }
     }
 }

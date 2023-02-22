@@ -1,6 +1,5 @@
 package com.board.spring_board_jwt.repository;
 
-import com.board.spring_board_jwt.entity.Board;
 import com.board.spring_board_jwt.entity.Likes;
 import org.springframework.data.jpa.repository.JpaRepository;
 
