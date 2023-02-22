@@ -29,8 +29,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
     private final BoardRepository boardRepository;
 
     private static ResponseEntity<Object> responseEntity(String msg) {
@@ -45,13 +43,13 @@ public class CommentService {
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("게시글이 존재하지 않습니다.")
         );
-
         Comment comment = Comment.builder()
                 .requestDto(requestDto)
                 .board(board)
                 .user(user)
                 .build();
         commentRepository.save(comment);
+        //연관관계 편의 메서드 작성
         comment.setBoard(board);
         return ResponseEntity.ok().body(CommentResponseDto.builder()
                 .comment(comment)

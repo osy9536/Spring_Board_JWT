@@ -16,6 +16,7 @@ public class BoardResponseDto {
     private String username;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+    private int likeNum;
 
     @Builder
     public BoardResponseDto(Board board) {
@@ -25,5 +26,6 @@ public class BoardResponseDto {
         username = board.getUser().getUsername();
         createdAt = board.getCreatedAt();
         modifiedAt = board.getModifiedAt();
+        likeNum = board.getLikesList().size();
     }
 }

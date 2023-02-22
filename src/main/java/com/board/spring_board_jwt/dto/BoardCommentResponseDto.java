@@ -16,8 +16,10 @@ public class BoardCommentResponseDto {
     private String username;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+    private int likesNum;
 
     private List<CommentResponseDto> commentList;
+
     @Builder
     public BoardCommentResponseDto(Board board,List<CommentResponseDto> commentList) {
         id = board.getId();
@@ -27,6 +29,7 @@ public class BoardCommentResponseDto {
         createdAt = board.getCreatedAt();
         modifiedAt = board.getModifiedAt();
         this.commentList = commentList;
+        likesNum = board.getLikesList().size();
     }
 
 }

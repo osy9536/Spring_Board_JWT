@@ -16,6 +16,7 @@ public class CommentResponseDto {
     private LocalDateTime modifiedAt;
 
     private String username;
+    private int likeNum;
     @Builder
     public CommentResponseDto(Comment comment) {
         id = comment.getId();
@@ -23,5 +24,6 @@ public class CommentResponseDto {
         createdAt = comment.getBoard().getCreatedAt();
         modifiedAt = comment.getBoard().getModifiedAt();
         username = comment.getUser().getUsername();
+        likeNum = comment.getLikesList().size();
     }
 }
