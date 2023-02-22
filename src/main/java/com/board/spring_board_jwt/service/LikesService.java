@@ -10,7 +10,6 @@ import com.board.spring_board_jwt.repository.CommentRepository;
 import com.board.spring_board_jwt.repository.LikesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
