@@ -1,6 +1,5 @@
 package com.board.spring_board_jwt.service;
 
-import com.board.spring_board_jwt.annotation.NoLogging;
 import com.board.spring_board_jwt.dto.ResponseMsgDto;
 import com.board.spring_board_jwt.dto.UserRequestDto;
 import com.board.spring_board_jwt.entity.User;
@@ -9,6 +8,7 @@ import com.board.spring_board_jwt.jwt.JwtUtil;
 import com.board.spring_board_jwt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,13 +25,18 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public ResponseMsgDto signup(UserRequestDto userRequestDto) {
+    public ResponseEntity<Object> signup(UserRequestDto userRequestDto) {
         String username = userRequestDto.getUsername();
         String password = passwordEncoder.encode(userRequestDto.getPassword());
+        //중복 회원 에러
+        ResponseMsgDto sameUser = ResponseMsgDto.builder()
+                .msg("중복된 username입니다.")
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build();
         // 회원 중복 확인
         Optional<User> found = userRepository.findByUsername(username);
         if (found.isPresent()) {
-            throw new IllegalArgumentException("중복된 username입니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(sameUser);
         }
         UserRoleEnum role = UserRoleEnum.USER;
         if (userRequestDto.isAdmin()) {
@@ -47,52 +52,72 @@ public class UserService {
                 .role(role)
                 .build();
         userRepository.save(user);
-        return ResponseMsgDto.builder()
+        ResponseMsgDto ok = ResponseMsgDto.builder()
                 .msg("회원가입 완료!")
                 .statusCode(HttpStatus.OK.value())
                 .build();
+        return ResponseEntity.status(HttpStatus.OK).body(ok);
     }
 
 
     @Transactional
-    public ResponseMsgDto login(UserRequestDto userRequestDto, HttpServletResponse response) {
+    public ResponseEntity<Object> login(UserRequestDto userRequestDto, HttpServletResponse response) {
         String username = userRequestDto.getUsername();
         String password = userRequestDto.getPassword();
+        ResponseMsgDto noUser = ResponseMsgDto.builder()
+                .msg("회원을 찾을 수 없습니다.")
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build();
+        ResponseMsgDto withdrawUser = ResponseMsgDto.builder()
+                .msg("탈퇴한 회원입니다.")
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build();
         if (userRepository.findByUsername(username).isEmpty()) {
-            throw new IllegalArgumentException("회원을 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noUser);
         }
         User user = userRepository.findByUsername(username).get();
         if (user.isWithdrawal()) { //탈퇴 회원 검증
-            throw new IllegalArgumentException("탈퇴한 회원입니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(withdrawUser);
         }
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(), user.getRole()));
-        return ResponseMsgDto.builder()
+        ResponseMsgDto responseMsgDto = ResponseMsgDto.builder()
                 .msg("로그인 완료!")
                 .statusCode(HttpStatus.OK.value())
                 .build();
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(), user.getRole()));
+        return ResponseEntity.status(HttpStatus.OK).body(responseMsgDto);
     }
     @Transactional
-    @NoLogging
-    public ResponseMsgDto withdrawal(User user) {
-        User user1 = userRepository.findByUsername(user.getUsername()).orElseThrow(
-                () -> {
-                    throw new IllegalArgumentException("회원이 존재하지 않습니다.");
-                }
-        );
-        user1.changeWithdrawal();
-        if (user1.isWithdrawal()) {
-            return ResponseMsgDto.builder()
-                    .msg("계정 탈퇴 성공")
-                    .statusCode(HttpStatus.OK.value())
-                    .build();
+    public ResponseEntity<Object> withdrawal(UserRequestDto userRequestDto, HttpServletResponse response) {
+        String username = userRequestDto.getUsername();
+        String password = userRequestDto.getPassword();
+        ResponseMsgDto noUser = ResponseMsgDto.builder()
+                .msg("회원을 찾을 수 없습니다.")
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build();
+
+        if (userRepository.findByUsername(username).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noUser);
+        }
+        User user = userRepository.findByUsername(username).get();
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+        ResponseMsgDto responseMsgDto = ResponseMsgDto.builder()
+                .msg("계정 탈퇴 성공")
+                .statusCode(HttpStatus.OK.value())
+                .build();
+        ResponseMsgDto responseMsgDto2 = ResponseMsgDto.builder()
+                .msg("계정 복구 성공")
+                .statusCode(HttpStatus.OK.value())
+                .build();
+        user.changeWithdrawal();
+        if (user.isWithdrawal()) {
+            return ResponseEntity.status(HttpStatus.OK).body(responseMsgDto);
         } else {
-            return ResponseMsgDto.builder()
-                    .msg("계정 복구 성공")
-                    .statusCode(HttpStatus.OK.value())
-                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(responseMsgDto2);
         }
     }
 }
