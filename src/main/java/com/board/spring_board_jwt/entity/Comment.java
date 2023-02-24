@@ -32,7 +32,7 @@ public class Comment extends Timestamped{
     private Board board;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
-    private List<Likes> likesList = new ArrayList<>();
+    private List<CommentLikes> commentLikes = new ArrayList<>();
     //연관관계 편의 메서드
     public void setBoard(Board board) {
         if (this.board != null) {

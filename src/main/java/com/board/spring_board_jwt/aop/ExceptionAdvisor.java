@@ -26,7 +26,6 @@ public class ExceptionAdvisor {
         }
         return ResponseEntity.status(HttpStatus.OK).body(ok);
     }
-
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> processWithdrawalError(IllegalArgumentException exception) {
         String exceptionMessage = exception.getMessage();

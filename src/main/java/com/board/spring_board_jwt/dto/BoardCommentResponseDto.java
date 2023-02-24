@@ -28,7 +28,7 @@ public class BoardCommentResponseDto {
         createdAt = board.getCreatedAt();
         modifiedAt = board.getModifiedAt();
         this.commentList = commentList;
-        likesNum = board.getLikesList().size();
+        likesNum = board.getBoardLikes().size();
     }
 
 }

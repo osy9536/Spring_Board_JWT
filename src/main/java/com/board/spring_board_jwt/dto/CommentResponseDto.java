@@ -23,6 +23,6 @@ public class CommentResponseDto {
         createdAt = comment.getBoard().getCreatedAt();
         modifiedAt = comment.getBoard().getModifiedAt();
         username = comment.getUser().getUsername();
-        likeNum = comment.getLikesList().size();
+        likeNum = comment.getCommentLikes().size();
     }
 }

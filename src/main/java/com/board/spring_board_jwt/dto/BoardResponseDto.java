@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 public class BoardResponseDto {
@@ -25,6 +24,6 @@ public class BoardResponseDto {
         username = board.getUser().getUsername();
         createdAt = board.getCreatedAt();
         modifiedAt = board.getModifiedAt();
-        likeNum = board.getLikesList().size();
+        likeNum = board.getBoardLikes().size();
     }
 }

@@ -47,7 +47,6 @@ public class CommentService {
                 .comment(comment)
                 .build();
     }
-
     @Transactional
     public CommentResponseDto update(User user,Long id, CommentRequestDto commentRequestDto) {
         Comment comment = commentRepository.findById(id).orElseThrow(
